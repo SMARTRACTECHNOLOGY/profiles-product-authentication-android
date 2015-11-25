@@ -1,0 +1,150 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.smartrac.profiles.productauth.MainActivity$ResultTagFragment" >
+
+    <Button
+        android:id="@+id/buttonOK"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:onClick="onClickOK"
+        android:text="@string/resulttag_btnOK" />
+
+	<!-- UID -->
+    <TextView
+        android:id="@+id/textViewUid"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/buttonOK"
+        android:text="@string/txtUidEmpty"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <!-- NTAG Type -->
+    <TextView
+        android:id="@+id/textViewNtagVersion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/textViewUid"
+        android:layout_below="@+id/textViewUid"
+        android:layout_marginTop="14dp"
+        android:text="@string/txtNtagEmpty"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <!-- Verification result -->
+    <TextView
+        android:id="@+id/textViewVerificationHeader"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/textViewUid"
+        android:layout_below="@+id/textViewNtagVersion"
+        android:layout_marginTop="14dp"
+        android:text="@string/txtVerificationHeader"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+    
+    <ImageView
+        android:id="@+id/imageViewNxpSignature"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/textViewVerificationHeader"
+        android:layout_below="@+id/textViewVerificationHeader"
+        android:layout_marginTop="12dp"
+        android:src="@drawable/ok" />
+    
+    <!-- NXP Signature -->
+    <TextView
+        android:id="@+id/textViewNxpSignature"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/buttonOK"
+        android:layout_toRightOf="@id/imageViewNxpSignature"
+        android:layout_marginLeft="12dp"
+        android:layout_alignTop="@id/imageViewNxpSignature"
+        android:minHeight="20dp"
+        android:text="@string/txtNxpSignature"
+        android:typeface="monospace" />
+    
+    <ImageView
+        android:id="@+id/imageViewProfilesAuth"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/textViewVerificationHeader"
+        android:layout_below="@+id/imageViewNxpSignature"
+        android:layout_marginTop="12dp"
+        android:src="@drawable/ok" />
+    
+    <!-- Profiles Tag Authentication -->
+    <TextView
+        android:id="@+id/textViewProfilesAuth"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/buttonOK"
+        android:layout_toRightOf="@id/imageViewProfilesAuth"
+        android:layout_marginLeft="12dp"
+        android:layout_alignTop="@id/imageViewProfilesAuth"
+        android:minHeight="20dp"
+        android:text="@string/txtProfilesAuth"
+        android:typeface="monospace" />
+    
+    <ImageView
+        android:id="@+id/imageViewProductAuth"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/textViewVerificationHeader"
+        android:layout_below="@+id/imageViewProfilesAuth"
+        android:layout_marginTop="12dp"
+        android:src="@drawable/ok" />
+    
+    <!-- Profiles Product Authentication -->
+    <TextView
+        android:id="@+id/textViewProductAuth"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/buttonOK"
+        android:layout_toRightOf="@id/imageViewProductAuth"
+        android:layout_marginLeft="12dp"
+        android:layout_alignTop="@id/imageViewProductAuth"
+        android:minHeight="20dp"
+        android:text="@string/txtProductAuth"
+        android:typeface="monospace" />
+    
+    <ImageView
+        android:id="@+id/imageViewVerification"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/imageViewProductAuth"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/logo_authentic" />
+    
+    <!-- Status Message -->
+    <ImageView
+        android:id="@+id/imageViewStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/textViewVerificationHeader"
+        android:layout_below="@+id/imageViewProductAuth"
+        android:layout_marginTop="12dp"
+        android:src="@drawable/warning" />
+    
+    <TextView
+        android:id="@+id/textViewStatusMsg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/buttonOK"
+        android:layout_toRightOf="@id/imageViewStatus"
+        android:layout_marginLeft="12dp"
+        android:layout_alignTop="@id/imageViewStatus"
+        android:minHeight="20dp"
+        android:text=""
+        android:typeface="monospace" />   
+
+</RelativeLayout>

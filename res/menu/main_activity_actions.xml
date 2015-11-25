@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+	<item android:id="@+id/cfgSettings"
+          android:title="@+string/cfgSettings"/>      
+	<item android:id="@+id/cfgAbout"
+          android:title="@+string/cfgAbout"/>  
+</menu>
