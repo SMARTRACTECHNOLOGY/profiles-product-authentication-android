@@ -9,8 +9,26 @@
         android:id="@+id/action_settings"
         android:orderInCategory="100"
         android:showAsAction="always"
-        android:title="@string/action_settings"/>   
+        android:title="@string/action_settings"/>
+    
+    <item
+        android:id="@+id/action_apidoc"
+        android:orderInCategory="100"
+        android:showAsAction="always"
+        android:title="@string/action_apidoc"/>      
 
+    <item
+        android:id="@+id/action_feedback"
+        android:orderInCategory="100"
+        android:showAsAction="always"
+        android:title="@string/action_feedback"/>
+    
+    <item
+        android:id="@+id/action_partner"
+        android:orderInCategory="100"
+        android:showAsAction="always"
+        android:title="@string/action_partner"/>      
+    
     <item
         android:id="@+id/action_about"
         android:orderInCategory="101"

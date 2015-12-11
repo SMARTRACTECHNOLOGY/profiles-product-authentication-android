@@ -1,6 +1,7 @@
 package com.smartrac.profiles.productauth;
 
 import java.io.IOException;
+import java.util.List;
 
 import com.smartrac.profiles.productauth.R;
 
@@ -8,10 +9,13 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -22,6 +26,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import android.net.Uri;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.nfc.tech.NfcA;
@@ -367,6 +372,15 @@ public class MainActivity extends Activity {
 	    	  iState = FWSTATE_SETTINGS;
 	    	  updateState();
 	    	  return true;
+	      case R.id.cfgApidoc:
+	    	  launchUrl(getString(R.string.urlApidoc));
+	    	  return true;
+	      case R.id.cfgFeedback:
+	    	  launchUrl(getString(R.string.urlFeedback));
+	    	  return true;	    	  
+	      case R.id.cfgPartner:
+	    	  launchUrl(getString(R.string.urlPartner));
+	    	  return true;
 	      case R.id.cfgAbout:
 	    	  //Toast.makeText(this, "About... is not implemented yet.", Toast.LENGTH_LONG).show();
 	    	  AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -386,6 +400,40 @@ public class MainActivity extends Activity {
 	        return super.onOptionsItemSelected(item);
 	    } 
 	}
+	
+	static final String EXTRA_LAUNCH_INTENT = "launchIntent";
+	 
+	boolean launchUrl(String url) {
+		try {
+			Intent intent = new Intent(Intent.ACTION_VIEW);
+			intent.setData(Uri.parse(url));
+			return tryStartActivity(intent);
+		} 
+		catch (Exception e) {
+			return false;
+		}
+	}
+	
+	boolean tryStartActivity(Intent intentToStart) {
+	    	
+    	try {
+	    	Context context = this.getApplicationContext();
+	    	PackageManager packageManager = context.getPackageManager();
+	    	
+	        List<ResolveInfo> activities = packageManager.queryIntentActivities(
+	                intentToStart, 0);
+	        if (activities.size() > 0) {
+	        	Intent rootIntent = Intent.createChooser(intentToStart, "Select app");
+	            rootIntent.putExtra(MainActivity.EXTRA_LAUNCH_INTENT, intentToStart);
+	            rootIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+	            context.startActivity(rootIntent);
+	        }
+        }
+        catch (Exception e) {
+            return false;
+        }
+        return true;
+    }	 
 	 
 	private class VerifyNtagTask extends AsyncTask<MainActivity, Integer, String[]>
 	{
