@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Profiles Product Authentication</string>
+    <string name="app_name">Profiles</string>
         
     <!-- Action menu -->
     <string name="action_settings">Settings</string>
@@ -11,12 +11,12 @@
     
     
     <string name="app_about">
-        Profiles Product Authentication for NFC enabled Android devices.\n
-        Version 1.4\n
+        SMART COSMOS Profiles for NFC enabled Android devices.\n
+        Version 1.5\n
         &#169; 2015 SMARTRAC TECHNOLOGY GROUP 
     </string>
     <string name="app_onClose">
-        Do you want to close the Profiles Product Authentication?
+        Do you want to close the Profiles?
     </string>
     <string name="txtYes">Yes</string>
     <string name="txtNo">No</string>
