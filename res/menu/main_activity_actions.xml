@@ -7,7 +7,9 @@
 	<item android:id="@+id/cfgFeedback"
           android:title="@+string/cfgFeedback"/>  
 	<item android:id="@+id/cfgPartner"
-          android:title="@+string/cfgPartner"/>  
+          android:title="@+string/cfgPartner"/>
+	<item android:id="@+id/cfgAccount"
+          android:title="@+string/cfgAccount"/> 	 
 	<item android:id="@+id/cfgAbout"
           android:title="@+string/cfgAbout"/>  
 </menu>

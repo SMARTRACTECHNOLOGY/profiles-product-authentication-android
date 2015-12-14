@@ -381,6 +381,13 @@ public class MainActivity extends Activity {
 	      case R.id.cfgPartner:
 	    	  launchUrl(getString(R.string.urlPartner));
 	    	  return true;
+	      case R.id.cfgAccount:
+	    	  launchEmail(
+	    			  getString(R.string.accEmailAddr),
+	    			  getString(R.string.accEmailSubj),
+	    			  getString(R.string.accEmailBody)
+	    			  );
+	    	  return true;
 	      case R.id.cfgAbout:
 	    	  //Toast.makeText(this, "About... is not implemented yet.", Toast.LENGTH_LONG).show();
 	    	  AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -412,6 +419,19 @@ public class MainActivity extends Activity {
 		catch (Exception e) {
 			return false;
 		}
+	}
+	
+	boolean launchEmail(String recipient, String subject, String body) {
+		try {
+			Intent intent = new Intent(Intent.ACTION_SENDTO);
+			intent.setData(Uri.parse("mailto:" + recipient));
+			intent.putExtra(Intent.EXTRA_SUBJECT, subject);
+			intent.putExtra(Intent.EXTRA_TEXT, body);
+			return tryStartActivity(intent);
+		}
+		catch (Exception e) {
+			return false;
+		}		
 	}
 	
 	boolean tryStartActivity(Intent intentToStart) {

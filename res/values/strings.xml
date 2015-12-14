@@ -11,7 +11,9 @@
     <string name="action_feedback">Feedback</string>
     <string name="cfgFeedback">Feedback&#8230;</string>
     <string name="action_partner">Partner Portal</string>
-    <string name="cfgPartner">Partner Portal&#8230;</string>    
+    <string name="cfgPartner">Partner Portal&#8230;</string>
+    <string name="action_account">Request Profiles account</string>
+    <string name="cfgAccount">Request Profiles account&#8230;</string>            
     <string name="action_about">About</string> 
     <string name="cfgAbout">About&#8230;</string>
     
@@ -59,5 +61,10 @@
     <string name="urlApidoc">https://api.smartcosmos.net</string>
     <string name="urlFeedback">https://smartractechnology.atlassian.net/rest/collectors/1.0/template/form/0a8f8726?os_authType=none</string>
     <string name="urlPartner">https://partner.smart-cosmos.com</string>
-
+    
+    <!-- Request Account -->
+    <string name="accEmailAddr">api@smartrac-group.com</string>
+    <string name="accEmailSubj">Request new Profiles account</string>
+    <string name="accEmailBody">Please create a new Profiles account for me.\n\nThank you!</string>
+        
 </resources>
