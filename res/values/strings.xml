@@ -38,6 +38,16 @@
     <string name="txtVerificationHeader">Verification result:</string>
     <string name="txtVerificationMsg"></string>
     
+    <!-- Welcome -->
+    <string name="txtWelcome1">
+        Welcome to SMART COSMOS\n\nThis app is public available on
+        <a href="https://github.com/SMARTRACTECHNOLOGY-PUBLIC/smartcosmos-sdk-java-android-samples">GitHub</a>
+        and demonstrates the integration from RFID with SMART COSMOS Profiles.
+	    Visit our <a href="https://partner.smart-cosmos.com">Partner Portal</a> and read through our
+	    <a href="https://api.smartcosmos.net">API documentation</a>.
+	</string>
+	<string name="welcome_btnOK">Continue</string>
+    
     <!-- Scan Tag -->
     <string name="scan_tag">Please scan a tag&#8230;</string>
     
@@ -59,6 +69,7 @@
     
     <!-- URLs -->
     <string name="urlApidoc">https://api.smartcosmos.net</string>
+    <string name="urlGithub">https://github.com/SMARTRACTECHNOLOGY-PUBLIC/smartcosmos-sdk-java-android-samples</string>
     <string name="urlFeedback">https://smartractechnology.atlassian.net/rest/collectors/1.0/template/form/0a8f8726?os_authType=none</string>
     <string name="urlPartner">https://partner.smart-cosmos.com</string>
     

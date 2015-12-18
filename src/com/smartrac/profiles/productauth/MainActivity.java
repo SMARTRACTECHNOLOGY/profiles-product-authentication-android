@@ -59,9 +59,10 @@ public class MainActivity extends Activity {
 	// state machine
 	final int FWSTATE_SCANTAG = 1;
 	final int FWSTATE_RESULTTAG = 2;
+	final int FWSTATE_WELCOME = 250;
 	final int FWSTATE_SETTINGS = 255;
 	
-	int iState = FWSTATE_SCANTAG;
+	int iState = FWSTATE_WELCOME;
 	int iImageStatus = IMAGE_NONE;
 	int iImageNxpSignature = IMAGE_NONE;
 	int iImageProfilesAuth = IMAGE_NONE;
@@ -94,6 +95,7 @@ public class MainActivity extends Activity {
 	private NfcNtag ntag;
 	private ProgressDialog progressDlg;
 	private byte[] uid;
+	private boolean settingsValid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,15 +139,10 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         if (savedInstanceState == null) {
         	getFragmentManager().beginTransaction()
-            	.add(R.id.container, new ScanTagFragment())
+            	.add(R.id.container, new WelcomeFragment())
             	.commit();
         }
-        if (!LoadSettings())
-        {
-        	Toast.makeText(this, "Settings needed.", Toast.LENGTH_LONG).show();
-        	iState = FWSTATE_SETTINGS;
-        	updateState();
-        }
+        settingsValid = LoadSettings();
     }
     
 	@Override
@@ -244,6 +241,19 @@ public class MainActivity extends Activity {
 	public void onClickOK(View view) {
 		
 		switch (iState) {
+			case FWSTATE_WELCOME:
+		        if (settingsValid)
+		        {
+					iState = FWSTATE_SCANTAG;
+					updateState();
+		        }
+		        else
+		        {
+		        	Toast.makeText(this, "Settings needed.", Toast.LENGTH_LONG).show();
+		        	iState = FWSTATE_SETTINGS;
+		        	updateState();		        	
+		        }
+			break;		
 			case FWSTATE_SCANTAG:
 				// this should never happen (no OK button in ScanTag)
 			break;
@@ -266,6 +276,10 @@ public class MainActivity extends Activity {
 	
 	public void updateState() {
 		switch (iState) {
+			case FWSTATE_WELCOME:
+		    	getFragmentManager().beginTransaction()
+				.replace(R.id.container, new WelcomeFragment())
+				.commit();				
 			case FWSTATE_SCANTAG:
 		    	getFragmentManager().beginTransaction()
 				.replace(R.id.container, new ScanTagFragment())
