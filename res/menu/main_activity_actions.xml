@@ -1,15 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android" >
-	<item android:id="@+id/cfgSettings"
-          android:title="@+string/cfgSettings"/>
-	<item android:id="@+id/cfgApidoc"
-          android:title="@+string/cfgApidoc"/>
-	<item android:id="@+id/cfgFeedback"
-          android:title="@+string/cfgFeedback"/>  
-	<item android:id="@+id/cfgPartner"
-          android:title="@+string/cfgPartner"/>
-	<item android:id="@+id/cfgAccount"
-          android:title="@+string/cfgAccount"/> 	 
-	<item android:id="@+id/cfgAbout"
-          android:title="@+string/cfgAbout"/>  
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/search"
+          android:icon="@drawable/ic_action_search"
+          android:title="@+string/search"
+          android:showAsAction="ifRoom" >
+		<menu>
+			<item android:id="@+id/searchTags"
+		          android:title="@+string/searchTags"/>		    
+		</menu>
+    </item>
+    <item android:id="@+id/config"
+          android:icon="@drawable/ic_action_overflow"
+          android:title="@+string/config"
+          android:showAsAction="ifRoom" >
+	    <menu>
+			<item android:id="@+id/cfgSettings"
+		          android:title="@+string/cfgSettings"/>
+			<item android:id="@+id/cfgApidoc"
+		          android:title="@+string/cfgApidoc"/>
+			<item android:id="@+id/cfgFeedback"
+		          android:title="@+string/cfgFeedback"/>  
+			<item android:id="@+id/cfgPartner"
+		          android:title="@+string/cfgPartner"/>
+			<item android:id="@+id/cfgAccount"
+		          android:title="@+string/cfgAccount"/> 	 
+			<item android:id="@+id/cfgAbout"
+		          android:title="@+string/cfgAbout"/>
+		</menu>
+	</item>
 </menu>

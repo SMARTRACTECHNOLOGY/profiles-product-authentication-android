@@ -1,6 +1,7 @@
 package com.smartrac.profiles.productauth;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 
 import com.smartrac.profiles.productauth.R;
@@ -37,9 +38,11 @@ import android.nfc.tech.NfcV;
 import com.smartrac.nfc.NfcNtag;
 import com.smartrac.nfc.NfcNtagVersion;
 import net.smartcosmos.android.utility.AsciiHexConverter;
+import net.smartcosmos.android.utility.IntentLauncher;
 import net.smartcosmos.android.ProfilesRestClient;
 import net.smartcosmos.android.ProfilesRestClient.ProfilesRestResult;
 import net.smartcosmos.android.ProfilesRestClient.ProfilesAuthOtpState;
+import net.smartcosmos.android.ProfilesQueryTagProperty;
 import com.smartrac.profiles.productauth.MainActivity;
 
 public class MainActivity extends Activity {
@@ -59,6 +62,8 @@ public class MainActivity extends Activity {
 	// state machine
 	final int FWSTATE_SCANTAG = 1;
 	final int FWSTATE_RESULTTAG = 2;
+	final int FWSTATE_QUERYTAGS = 3;
+	final int FWSTATE_FOUNDTAGS = 4;
 	final int FWSTATE_WELCOME = 250;
 	final int FWSTATE_SETTINGS = 255;
 	
@@ -86,11 +91,15 @@ public class MainActivity extends Activity {
 	private String currentProfilesAuthMsg;
 	private String currentProductAuthMsg;
 	private String currentStatusMsg;
-	//private String currentVerificationMsg;
 	
 	private String server;
 	private String user;
 	private String password;
+	
+	private ProfilesQueryTagProperty criteriaType;
+	private int queryMaxCount = 100;
+	private String criteriaValue = "";
+	private String[] foundTagIds;
 	
 	private NfcNtag ntag;
 	private ProgressDialog progressDlg;
@@ -261,6 +270,32 @@ public class MainActivity extends Activity {
 				iState = FWSTATE_SCANTAG;
 				updateState();
 			break;
+			case FWSTATE_QUERYTAGS:
+				QueryTagsFragment qtf = (QueryTagsFragment)getFragmentManager().findFragmentById(R.id.container);
+				criteriaValue = qtf.getCriteriaValue();
+				try {
+					criteriaType = ProfilesQueryTagProperty.parseProfilesQueryTagProperty(qtf.getCriteriaType());
+					try {
+						queryMaxCount = Integer.parseInt(qtf.getMaxCountValue());
+					}
+					catch (NumberFormatException e) {
+						queryMaxCount = 0;
+					}
+					progressDlg.setTitle("Looking up tags...");
+					new QueryTagsTask().execute(this);
+					
+				}
+				catch (IllegalArgumentException e) {
+					Toast.makeText(this, "Invalid tag property.", Toast.LENGTH_LONG).show();
+				}				
+				catch (NullPointerException e) {
+					Toast.makeText(this, "Undefined tag property.", Toast.LENGTH_LONG).show();
+				}
+			break;
+			case FWSTATE_FOUNDTAGS:
+				iState = FWSTATE_SCANTAG;
+				updateState();
+			break;				
 			case FWSTATE_SETTINGS:
 				SettingsFragment sf = (SettingsFragment)getFragmentManager().findFragmentById(R.id.container);
 				server = sf.getServer();
@@ -302,6 +337,25 @@ public class MainActivity extends Activity {
 				.replace(R.id.container, rtf)
 				.commit();
 			break;
+			case FWSTATE_QUERYTAGS:
+				QueryTagsFragment qtf = new QueryTagsFragment();
+				qtf.setCriteriaValue(criteriaValue);
+		    	getFragmentManager().beginTransaction()
+				.replace(R.id.container, qtf)
+				.commit();					
+			break;
+			case FWSTATE_FOUNDTAGS:
+				FoundTagsFragment ftf = new FoundTagsFragment();
+				Drawable[] icons = new Drawable[foundTagIds.length];
+				for (int i = 0; i < foundTagIds.length; i++) {
+					icons[i] = aImagesState[IMAGE_OK];
+				}
+				ftf.setStatusImages(icons);
+				ftf.setUids(foundTagIds);
+		    	getFragmentManager().beginTransaction()
+				.replace(R.id.container, ftf)
+				.commit();					
+			break;			
 			case FWSTATE_SETTINGS:
 				SettingsFragment sf = new SettingsFragment();
 				sf.setServer(server);
@@ -320,7 +374,9 @@ public class MainActivity extends Activity {
 	
 	@Override
 	public void onBackPressed() {
-	if (iState == FWSTATE_SETTINGS)
+	if ((iState == FWSTATE_SETTINGS) || 
+		(iState == FWSTATE_QUERYTAGS) ||
+		(iState == FWSTATE_FOUNDTAGS))
 	{
 		iState = FWSTATE_SCANTAG;
 		updateState();
@@ -382,21 +438,25 @@ public class MainActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 	    // Handle presses on the action bar items
 	    switch (item.getItemId()) {
+	      case R.id.searchTags:
+	    	  iState = FWSTATE_QUERYTAGS;
+	    	  updateState();
+	    	  return true;
 	      case R.id.cfgSettings:
 	    	  iState = FWSTATE_SETTINGS;
 	    	  updateState();
 	    	  return true;
 	      case R.id.cfgApidoc:
-	    	  launchUrl(getString(R.string.urlApidoc));
+	    	  new IntentLauncher(this).launchUrl(getString(R.string.urlApidoc));
 	    	  return true;
 	      case R.id.cfgFeedback:
-	    	  launchUrl(getString(R.string.urlFeedback));
+	    	  new IntentLauncher(this).launchUrl(getString(R.string.urlFeedback));
 	    	  return true;	    	  
 	      case R.id.cfgPartner:
-	    	  launchUrl(getString(R.string.urlPartner));
+	    	  new IntentLauncher(this).launchUrl(getString(R.string.urlPartner));
 	    	  return true;
 	      case R.id.cfgAccount:
-	    	  launchEmail(
+	    	  new IntentLauncher(this).launchEmail(
 	    			  getString(R.string.accEmailAddr),
 	    			  getString(R.string.accEmailSubj),
 	    			  getString(R.string.accEmailBody)
@@ -422,53 +482,6 @@ public class MainActivity extends Activity {
 	    } 
 	}
 	
-	static final String EXTRA_LAUNCH_INTENT = "launchIntent";
-	 
-	boolean launchUrl(String url) {
-		try {
-			Intent intent = new Intent(Intent.ACTION_VIEW);
-			intent.setData(Uri.parse(url));
-			return tryStartActivity(intent);
-		} 
-		catch (Exception e) {
-			return false;
-		}
-	}
-	
-	boolean launchEmail(String recipient, String subject, String body) {
-		try {
-			Intent intent = new Intent(Intent.ACTION_SENDTO);
-			intent.setData(Uri.parse("mailto:" + recipient));
-			intent.putExtra(Intent.EXTRA_SUBJECT, subject);
-			intent.putExtra(Intent.EXTRA_TEXT, body);
-			return tryStartActivity(intent);
-		}
-		catch (Exception e) {
-			return false;
-		}		
-	}
-	
-	boolean tryStartActivity(Intent intentToStart) {
-	    	
-    	try {
-	    	Context context = this.getApplicationContext();
-	    	PackageManager packageManager = context.getPackageManager();
-	    	
-	        List<ResolveInfo> activities = packageManager.queryIntentActivities(
-	                intentToStart, 0);
-	        if (activities.size() > 0) {
-	        	Intent rootIntent = Intent.createChooser(intentToStart, "Select app");
-	            rootIntent.putExtra(MainActivity.EXTRA_LAUNCH_INTENT, intentToStart);
-	            rootIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-	            context.startActivity(rootIntent);
-	        }
-        }
-        catch (Exception e) {
-            return false;
-        }
-        return true;
-    }	 
-	 
 	private class VerifyNtagTask extends AsyncTask<MainActivity, Integer, String[]>
 	{
 		static final int MSG_NTAGVERSION = 0;
@@ -786,6 +799,82 @@ public class MainActivity extends Activity {
 		});
 		builder.show();	
 	}
+	
+	private class QueryTagsTask extends AsyncTask<MainActivity, Integer, String[]>
+	{
+		@Override
+		protected void onPreExecute()
+		{
+			super.onPreExecute();
+			progressDlg.show();
+		}
+
+		@Override
+		protected String[] doInBackground(MainActivity... params)
+		{
+			String[] tagIds;
+			String[] sResult;
+			MainActivity activity = params[0];
+			
+			try {
+				HashMap<ProfilesQueryTagProperty, Object> queryMap = new HashMap<ProfilesQueryTagProperty, Object>();
+				queryMap.put(activity.criteriaType, activity.criteriaValue);
+				if (activity.queryMaxCount > 0) {
+					queryMap.put(ProfilesQueryTagProperty.count, activity.queryMaxCount);
+				}
+				ProfilesRestClient client= new ProfilesRestClient(
+						activity.server,
+						activity.user,
+						activity.password
+					);
+				
+				tagIds = client.getTagsByProperties(queryMap);
+				if (tagIds.length > 0)
+				{
+					sResult = new String[tagIds.length + 1];
+					sResult[0] = String.format("%d", tagIds.length);
+					for (int i = 0; i < tagIds.length; i++)
+					{
+						sResult[i + 1] = tagIds[i];
+					}
+				}
+				else
+				{
+					sResult = new String[2];
+					sResult[0] = "0";
+					sResult[1] = "No matching tags found";
+				}
+			}
+			catch (Exception e) {
+				sResult = new String[2];
+				sResult[0] = "-1";
+				sResult[1] = "Error: " + e.getMessage();
+			}			
+			return sResult;			
+		}
+		
+		@Override
+		protected void onPostExecute(String[] response)
+		{
+			progressDlg.dismiss();
+			int numTags = Integer.parseInt(response[0]);
+			switch (numTags)
+			{
+				case -1:
+				case 0:
+					displayTestConnectionResults(response);
+					break;
+				default:
+					foundTagIds = new String[numTags];
+					for (int i = 0; i < numTags; i++) {
+						foundTagIds[i] = response[i+1];
+					}
+					iState = FWSTATE_FOUNDTAGS;
+					updateState();					
+			}
+
+		}
+	}	
 	
 	private class TestConnectionTask extends AsyncTask<MainActivity, Integer, String[]>
 	{

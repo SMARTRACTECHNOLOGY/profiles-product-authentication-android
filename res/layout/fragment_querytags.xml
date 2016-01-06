@@ -1,0 +1,83 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.smartrac.profiles.productauth.MainActivity$QueryTagsFragment" >
+    
+    <Button
+        android:id="@+id/buttonOK"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:onClick="onClickOK"
+        android:text="@string/queryTags_btnOK" />    
+    
+    <!--
+    
+    <ImageView
+        android:id="@+id/imageViewProfilesBanner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/profiles_banner" />
+
+    -->
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/buttonOK"
+        android:text="@string/txtQueryTags"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <Spinner
+        android:id="@+id/spinCriteria"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/buttonOK"
+        android:layout_below="@+id/textView1"
+        android:layout_marginTop="16dp"
+        android:entries="@array/queryTagsArray" />
+
+    <EditText
+        android:id="@+id/editTextCriteria"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/buttonOK"
+        android:layout_alignRight="@+id/buttonOK"
+        android:layout_below="@+id/spinCriteria"
+        android:ems="10"
+        android:inputType="text" >
+
+        <requestFocus />
+    </EditText>
+
+    <TextView
+        android:id="@+id/textViewMaxCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/buttonOK"
+        android:layout_below="@+id/editTextCriteria"
+        android:layout_marginTop="16dp"
+        android:text="@string/txtQueryCount" />
+
+    <Spinner
+        android:id="@+id/spinMaxCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/buttonOK"
+        android:layout_below="@+id/textViewMaxCount"
+        android:layout_marginTop="16dp"
+        android:entries="@array/queryCountArray" />
+
+</RelativeLayout>

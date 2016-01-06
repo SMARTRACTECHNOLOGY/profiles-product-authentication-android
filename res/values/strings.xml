@@ -4,6 +4,12 @@
     <string name="app_name">Profiles</string>
         
     <!-- Action menu -->
+    <string name="search">Search</string>
+    
+	<string name="searchTags">Query Tags&#8230;</string>
+    
+    <string name="config">Config</string>
+    
     <string name="action_settings">Settings</string>
     <string name="cfgSettings">Settings&#8230;</string>
     <string name="action_apidoc">API Documentation</string>
@@ -56,6 +62,15 @@
     <string name="txtProfilesAuth">Tag Authentication:</string>
     <string name="txtProductAuth">Product Authentication:</string>
     <string name="resulttag_btnOK">OK</string>
+    
+    <!-- Query Tags -->
+    <string name="txtQueryTags">Find Tags By Criteria</string>
+    <string name="txtQueryCount">Max number of results:</string>
+    <string name="queryTags_btnOK">Find Tags</string>
+
+    <!-- Found Tags -->
+    <string name="txtFoundTags">Tags Found:</string>
+    <string name="foundTags_btnOK">OK</string>    
     
     <!-- Settings -->
     <string name="settingsNetworkTitle">Network settings</string>

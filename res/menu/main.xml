@@ -6,38 +6,56 @@
     <!--  xmlns:app="http://schemas.android.com/apk/res-auto"  -->
     
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/search"
         android:orderInCategory="100"
+        android:showAsAction="always"
+        android:title="@string/search"/>   
+        
+    <item
+        android:id="@+id/search"
+        android:orderInCategory="101"
+        android:showAsAction="always"
+        android:title="@string/searchTags"/>     
+
+    <item
+        android:id="@+id/config"
+        android:orderInCategory="200"
+        android:showAsAction="always"
+        android:title="@string/config"/>       
+    
+    <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="201"
         android:showAsAction="always"
         android:title="@string/action_settings"/>
     
     <item
         android:id="@+id/action_apidoc"
-        android:orderInCategory="100"
+        android:orderInCategory="202"
         android:showAsAction="always"
         android:title="@string/action_apidoc"/>      
 
     <item
         android:id="@+id/action_feedback"
-        android:orderInCategory="100"
+        android:orderInCategory="203"
         android:showAsAction="always"
         android:title="@string/action_feedback"/>
     
     <item
         android:id="@+id/action_partner"
-        android:orderInCategory="100"
+        android:orderInCategory="204"
         android:showAsAction="always"
         android:title="@string/action_partner"/>      
     
     <item
         android:id="@+id/action_account"
-        android:orderInCategory="100"
+        android:orderInCategory="205"
         android:showAsAction="always"
         android:title="@string/action_account"/>  
 
     <item
         android:id="@+id/action_about"
-        android:orderInCategory="101"
+        android:orderInCategory="206"
         android:showAsAction="always"
         android:title="@string/action_about"/>        
 
