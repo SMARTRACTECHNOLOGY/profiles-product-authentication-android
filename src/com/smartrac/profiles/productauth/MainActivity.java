@@ -2,7 +2,6 @@ package com.smartrac.profiles.productauth;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 
 import com.smartrac.profiles.productauth.R;
 
@@ -10,13 +9,10 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -27,7 +23,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import android.net.Uri;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.nfc.tech.NfcA;
@@ -43,7 +38,6 @@ import net.smartcosmos.android.ProfilesRestClient;
 import net.smartcosmos.android.ProfilesRestClient.ProfilesRestResult;
 import net.smartcosmos.android.ProfilesRestClient.ProfilesAuthOtpState;
 import net.smartcosmos.android.ProfilesQueryTagProperty;
-import com.smartrac.profiles.productauth.MainActivity;
 
 public class MainActivity extends Activity {
 	
