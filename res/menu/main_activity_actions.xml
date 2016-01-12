@@ -6,8 +6,10 @@
           android:title="@+string/search"
           android:showAsAction="ifRoom" >
 		<menu>
+			<item android:id="@+id/searchBatches"
+		          android:title="@+string/searchBatches"/>		    
 			<item android:id="@+id/searchTags"
-		          android:title="@+string/searchTags"/>		    
+		          android:title="@+string/searchTags"/>	    
 		</menu>
     </item>
     <item android:id="@+id/config"

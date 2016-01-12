@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="queryTagsArray">
-        <item>Batch</item>
-        <item>customerPO</item>
-        <item>Delivery</item>
-        <item>Order</item>
+        <item>@string/paramBatchId</item>
     </string-array>
 </resources>

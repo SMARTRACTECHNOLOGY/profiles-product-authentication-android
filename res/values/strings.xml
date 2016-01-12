@@ -6,6 +6,7 @@
     <!-- Action menu -->
     <string name="search">Search</string>
     
+    <string name="searchBatches">Query Batches&#8230;</string>
 	<string name="searchTags">Query Tags&#8230;</string>
     
     <string name="config">Config</string>
@@ -25,9 +26,9 @@
     
     
     <string name="app_about">
-        SMART COSMOS Profiles for NFC enabled Android devices.\n
-        Version 1.5\n
-        &#169; 2015 SMARTRAC TECHNOLOGY GROUP 
+        SMART COSMOS Profiles App\n
+        Version 1.7\n
+        &#169; 2016 SMARTRAC TECHNOLOGY Fletcher, Inc. 
     </string>
     <string name="app_onClose">
         Do you want to close Profiles?
@@ -55,7 +56,7 @@
 	<string name="welcome_btnOK">Continue</string>
     
     <!-- Scan Tag -->
-    <string name="scan_tag">Please scan a tag&#8230;</string>
+    <string name="scan_tag">Scan either a secure tag or a unknown tag to check the authentication result&#8230;</string>
     
     <!-- Result Tag -->
     <string name="txtNxpSignature">NXP Signature Check:</string>
@@ -63,10 +64,27 @@
     <string name="txtProductAuth">Product Authentication:</string>
     <string name="resulttag_btnOK">OK</string>
     
+    <!-- Query Batches -->
+    <string name="txtQueryBatches">Find Batches By Criteria</string>
+    <string name="txtQueryCount">Max number of results:</string>
+    <string name="queryBatches_btnOK">Find Batches</string>
+    
+    <string name="paramCustomerPO">Customer Purchase Order</string>
+    <string name="paramDelivery">Delivery Number</string>
+    <string name="paramOrderId">Order ID Number</string>
+
+    <!-- Found Batches -->
+    <string name="txtFoundBatches">Batches Found:</string>
+    <string name="foundBatches_btnOK">OK</string>      
+    
     <!-- Query Tags -->
     <string name="txtQueryTags">Find Tags By Criteria</string>
-    <string name="txtQueryCount">Max number of results:</string>
+    <!-- <string name="txtQueryCount">Max number of results:</string> -->
+    <string name="queryTagsUrnPrefix">urn:uuid:</string>
+    <string name="queryTagsUrnSmartracPrefix">urn:uuid:smartrac-group:batch:</string>
     <string name="queryTags_btnOK">Find Tags</string>
+    
+    <string name="paramBatchId">Batch ID</string>
 
     <!-- Found Tags -->
     <string name="txtFoundTags">Tags Found:</string>
@@ -76,10 +94,13 @@
     <string name="settingsNetworkTitle">Network settings</string>
     <string name="settingsNetworkServer">Profiles Server</string>
     <string name="hintNetworkServer">http://profiles-server.net:8080</string>
+    <string name="defaultNetworkServer">https://profiles-demo.smartcosmos.net</string>
     <string name="settingsNetworkUser">Profiles User</string>
     <string name="hintNetworkUser">user@domain.com</string>
+    <string name="defaultNetworkUser"></string>
     <string name="settingsNetworkPassword">Profiles Password</string>
     <string name="hintNetworkPassword">password</string>
+    <string name="defaultNetworkPassword"></string>
     <string name="button_testConnection">Test Connection</string>
     
     <!-- URLs -->

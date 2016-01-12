@@ -2,6 +2,7 @@ package com.smartrac.profiles.productauth;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 
 import com.smartrac.profiles.productauth.R;
 
@@ -21,6 +22,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Toast;
 
 import android.nfc.NfcAdapter;
@@ -37,9 +40,10 @@ import net.smartcosmos.android.utility.IntentLauncher;
 import net.smartcosmos.android.ProfilesRestClient;
 import net.smartcosmos.android.ProfilesRestClient.ProfilesRestResult;
 import net.smartcosmos.android.ProfilesRestClient.ProfilesAuthOtpState;
+import net.smartcosmos.android.ProfilesQueryBatchProperty;
 import net.smartcosmos.android.ProfilesQueryTagProperty;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements OnItemClickListener {
 	
 	// debug stuff
 	static final boolean DEBUG = true;
@@ -56,8 +60,10 @@ public class MainActivity extends Activity {
 	// state machine
 	final int FWSTATE_SCANTAG = 1;
 	final int FWSTATE_RESULTTAG = 2;
-	final int FWSTATE_QUERYTAGS = 3;
-	final int FWSTATE_FOUNDTAGS = 4;
+	final int FWSTATE_QUERYBATCHES = 3;
+	final int FWSTATE_FOUNDBATCHES = 4;	
+	final int FWSTATE_QUERYTAGS = 5;
+	final int FWSTATE_FOUNDTAGS = 6;
 	final int FWSTATE_WELCOME = 250;
 	final int FWSTATE_SETTINGS = 255;
 	
@@ -89,16 +95,24 @@ public class MainActivity extends Activity {
 	private String server;
 	private String user;
 	private String password;
-	
-	private ProfilesQueryTagProperty criteriaType;
+
 	private int queryMaxCount = 100;
-	private String criteriaValue = "";
+	
+	private ProfilesQueryBatchProperty batchCriteriaType;
+	private String batchCriteriaValue = "";
+	private String[] foundBatchUrns;	
+	private Map<String, ProfilesQueryBatchProperty>batchCriteriaMap;
+	
+	private ProfilesQueryTagProperty tagCriteriaType;
+	private String tagCriteriaValue = "";
 	private String[] foundTagIds;
+	private Map<String, ProfilesQueryTagProperty>tagCriteriaMap;
 	
 	private NfcNtag ntag;
 	private ProgressDialog progressDlg;
 	private byte[] uid;
 	private boolean settingsValid;
+	private boolean tagIdsFromBatch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,7 +129,16 @@ public class MainActivity extends Activity {
         aImagesState[IMAGE_ERROR] = MainActivity.this.getResources().getDrawable(R.drawable.error);
         aImagesState[IMAGE_CERTIFIED] = MainActivity.this.getResources().getDrawable(R.drawable.logo_authentic);
         aImagesState[IMAGE_INVALID] = MainActivity.this.getResources().getDrawable(R.drawable.logo_authfailed);
+        
+        // prepare search criterias
+        batchCriteriaMap = new HashMap<String, ProfilesQueryBatchProperty>();
+        batchCriteriaMap.put(getString(R.string.paramCustomerPO), ProfilesQueryBatchProperty.customerPO);
+        batchCriteriaMap.put(getString(R.string.paramDelivery), ProfilesQueryBatchProperty.delivId);
+        batchCriteriaMap.put(getString(R.string.paramOrderId), ProfilesQueryBatchProperty.orderId);
 		
+        tagCriteriaMap = new HashMap<String, ProfilesQueryTagProperty>();
+        tagCriteriaMap.put(getString(R.string.paramBatchId), ProfilesQueryTagProperty.batchUrn);
+        
 		// find default adapter 
 		nfcAdapter = NfcAdapter.getDefaultAdapter(this);
 		if (nfcAdapter == null)
@@ -241,6 +264,21 @@ public class MainActivity extends Activity {
 	    }
 	}
 	
+	@Override
+	public void onItemClick(AdapterView<?> adapter, View arg1, int position, long arg3) {
+		if (iState == FWSTATE_FOUNDBATCHES) {
+			if (foundBatchUrns != null) {
+				if (position < foundBatchUrns.length) {
+					tagCriteriaType = ProfilesQueryTagProperty.batchUrn;
+					tagCriteriaValue = foundBatchUrns[position];
+					progressDlg.setTitle("Looking up tags...");
+					tagIdsFromBatch = true;
+					new QueryTagsTask().execute(this);					
+				}
+			}
+		}
+	}
+	
 	public void onClickOK(View view) {
 		
 		switch (iState) {
@@ -264,32 +302,60 @@ public class MainActivity extends Activity {
 				iState = FWSTATE_SCANTAG;
 				updateState();
 			break;
+			case FWSTATE_QUERYBATCHES:
+				QueryBatchesFragment qbf = (QueryBatchesFragment)getFragmentManager().findFragmentById(R.id.container);
+				batchCriteriaType = batchCriteriaMap.get(qbf.getCriteriaType());
+				batchCriteriaValue = qbf.getCriteriaValue();
+				try {
+					queryMaxCount = Integer.parseInt(qbf.getMaxCountValue());
+				}
+				catch (NumberFormatException e) {
+					queryMaxCount = 0;
+				}
+				if (batchCriteriaValue.isEmpty()) {
+					Toast.makeText(this, "Search criteria must not be empty.", Toast.LENGTH_LONG).show();
+				}
+				else {
+					progressDlg.setTitle("Looking up batches...");
+					new QueryBatchesTask().execute(this);
+				}					
+			break;
+			case FWSTATE_FOUNDBATCHES:
+				iState = FWSTATE_QUERYBATCHES;
+				updateState();
+			break;			
 			case FWSTATE_QUERYTAGS:
 				QueryTagsFragment qtf = (QueryTagsFragment)getFragmentManager().findFragmentById(R.id.container);
-				criteriaValue = qtf.getCriteriaValue();
+				tagCriteriaType = tagCriteriaMap.get(qtf.getCriteriaType());
+				tagCriteriaValue = qtf.getCriteriaValue();
+				if (!tagCriteriaValue.startsWith(getString(R.string.queryTagsUrnPrefix))) {
+					tagCriteriaValue = getString(R.string.queryTagsUrnSmartracPrefix) + tagCriteriaValue;
+				}
 				try {
-					criteriaType = ProfilesQueryTagProperty.parseProfilesQueryTagProperty(qtf.getCriteriaType());
-					try {
-						queryMaxCount = Integer.parseInt(qtf.getMaxCountValue());
-					}
-					catch (NumberFormatException e) {
-						queryMaxCount = 0;
-					}
+					queryMaxCount = Integer.parseInt(qtf.getMaxCountValue());
+				}
+				catch (NumberFormatException e) {
+					queryMaxCount = 0;
+				}
+				if (tagCriteriaValue.isEmpty()) {
+					Toast.makeText(this, "Search criteria must not be empty.", Toast.LENGTH_LONG).show();
+				}
+				else {					
+					tagIdsFromBatch = false;
 					progressDlg.setTitle("Looking up tags...");
 					new QueryTagsTask().execute(this);
-					
-				}
-				catch (IllegalArgumentException e) {
-					Toast.makeText(this, "Invalid tag property.", Toast.LENGTH_LONG).show();
-				}				
-				catch (NullPointerException e) {
-					Toast.makeText(this, "Undefined tag property.", Toast.LENGTH_LONG).show();
 				}
 			break;
 			case FWSTATE_FOUNDTAGS:
-				iState = FWSTATE_SCANTAG;
-				updateState();
-			break;				
+				if (tagIdsFromBatch) {
+					iState = FWSTATE_FOUNDBATCHES;
+					updateState();					
+				}
+				else {
+					iState = FWSTATE_QUERYTAGS;
+					updateState();					
+				}
+			break;		
 			case FWSTATE_SETTINGS:
 				SettingsFragment sf = (SettingsFragment)getFragmentManager().findFragmentById(R.id.container);
 				server = sf.getServer();
@@ -304,6 +370,8 @@ public class MainActivity extends Activity {
 	}
 	
 	public void updateState() {
+		Drawable[] icons;
+		
 		switch (iState) {
 			case FWSTATE_WELCOME:
 		    	getFragmentManager().beginTransaction()
@@ -331,16 +399,35 @@ public class MainActivity extends Activity {
 				.replace(R.id.container, rtf)
 				.commit();
 			break;
+			case FWSTATE_QUERYBATCHES:
+				QueryBatchesFragment qbf = new QueryBatchesFragment();
+				qbf.setCriteriaValue(batchCriteriaValue);
+		    	getFragmentManager().beginTransaction()
+				.replace(R.id.container, qbf)
+				.commit();					
+			break;
+			case FWSTATE_FOUNDBATCHES:
+				FoundBatchesFragment fbf = new FoundBatchesFragment();
+				icons = new Drawable[foundBatchUrns.length];
+				for (int i = 0; i < foundBatchUrns.length; i++) {
+					icons[i] = aImagesState[IMAGE_OK];
+				}
+				fbf.setStatusImages(icons);
+				fbf.setUids(foundBatchUrns);
+		    	getFragmentManager().beginTransaction()
+				.replace(R.id.container, fbf)
+				.commit();					
+			break;			
 			case FWSTATE_QUERYTAGS:
 				QueryTagsFragment qtf = new QueryTagsFragment();
-				qtf.setCriteriaValue(criteriaValue);
+				qtf.setCriteriaValue(tagCriteriaValue);
 		    	getFragmentManager().beginTransaction()
 				.replace(R.id.container, qtf)
 				.commit();					
 			break;
 			case FWSTATE_FOUNDTAGS:
 				FoundTagsFragment ftf = new FoundTagsFragment();
-				Drawable[] icons = new Drawable[foundTagIds.length];
+				icons = new Drawable[foundTagIds.length];
 				for (int i = 0; i < foundTagIds.length; i++) {
 					icons[i] = aImagesState[IMAGE_OK];
 				}
@@ -349,7 +436,7 @@ public class MainActivity extends Activity {
 		    	getFragmentManager().beginTransaction()
 				.replace(R.id.container, ftf)
 				.commit();					
-			break;			
+			break;		
 			case FWSTATE_SETTINGS:
 				SettingsFragment sf = new SettingsFragment();
 				sf.setServer(server);
@@ -368,27 +455,40 @@ public class MainActivity extends Activity {
 	
 	@Override
 	public void onBackPressed() {
-	if ((iState == FWSTATE_SETTINGS) || 
-		(iState == FWSTATE_QUERYTAGS) ||
-		(iState == FWSTATE_FOUNDTAGS))
-	{
-		iState = FWSTATE_SCANTAG;
-		updateState();
-	}
-	else
-	{
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-	  	builder.setTitle(R.string.app_name)
-	  	   .setIcon(R.drawable.ic_launcher)
-	  	   .setMessage(R.string.app_onClose)
-	       .setPositiveButton(R.string.txtYes, new DialogInterface.OnClickListener() {
-	             public void onClick(DialogInterface dialog, int id) {
-	            	 MainActivity mainact = getActivity();
-	            	 mainact.finish();
-	             }
-	         })
-	        .setNegativeButton(R.string.txtNo, null);
-	  	builder.show();
+		switch (iState) {
+			case FWSTATE_SETTINGS:
+			case FWSTATE_QUERYBATCHES:
+			case FWSTATE_QUERYTAGS:
+				iState = FWSTATE_SCANTAG;
+				updateState();
+				break;
+			case FWSTATE_FOUNDBATCHES:
+				iState = FWSTATE_QUERYBATCHES;
+				updateState();
+				break;				
+			case FWSTATE_FOUNDTAGS:
+				if (tagIdsFromBatch) {
+					iState = FWSTATE_FOUNDBATCHES;
+					updateState();					
+				}
+				else {
+					iState = FWSTATE_QUERYTAGS;
+					updateState();					
+				}
+		break;
+		default:
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		  	builder.setTitle(R.string.app_name)
+		  	   .setIcon(R.drawable.ic_launcher)
+		  	   .setMessage(R.string.app_onClose)
+		       .setPositiveButton(R.string.txtYes, new DialogInterface.OnClickListener() {
+		             public void onClick(DialogInterface dialog, int id) {
+		            	 MainActivity mainact = getActivity();
+		            	 mainact.finish();
+		             }
+		         })
+		        .setNegativeButton(R.string.txtNo, null);
+		  	builder.show();
 		}
 	}
 	
@@ -396,11 +496,11 @@ public class MainActivity extends Activity {
 	private boolean LoadSettings()
 	{
 		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-		server = settings.getString("network.server", "");
-		user = settings.getString("network.user", "");
-		password = settings.getString("network.password", "");
-		Log.d(TAG, "User: " + user);
+		server = settings.getString("network.server", getString(R.string.defaultNetworkServer));
+		user = settings.getString("network.user", getString(R.string.defaultNetworkUser));
+		password = settings.getString("network.password", getString(R.string.defaultNetworkPassword));
 		Log.d(TAG, "Server: " + server);
+		Log.d(TAG, "User: " + user);
 		Log.d(TAG, "Password: " + password);
 
 		return ((server.length() > 0) && (user.length() > 0) && (password.length() > 0));
@@ -409,8 +509,8 @@ public class MainActivity extends Activity {
 	private void SaveSettings()
 	{
 		SharedPreferences.Editor editor = getSharedPreferences(PREFS_NAME, 0).edit();
+		Log.d(TAG, "Server: " + server);		
 		Log.d(TAG, "User: " + user);
-		Log.d(TAG, "Server: " + server);
 		Log.d(TAG, "Password: " + password);
 		editor.putString("network.server", server);
 		editor.putString("network.user", user);
@@ -432,6 +532,10 @@ public class MainActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 	    // Handle presses on the action bar items
 	    switch (item.getItemId()) {
+	      case R.id.searchBatches:
+	    	  iState = FWSTATE_QUERYBATCHES;
+	    	  updateState();
+	    	  return true;	    	
 	      case R.id.searchTags:
 	    	  iState = FWSTATE_QUERYTAGS;
 	    	  updateState();
@@ -794,6 +898,82 @@ public class MainActivity extends Activity {
 		builder.show();	
 	}
 	
+	private class QueryBatchesTask extends AsyncTask<MainActivity, Integer, String[]>
+	{
+		@Override
+		protected void onPreExecute()
+		{
+			super.onPreExecute();
+			progressDlg.show();
+		}
+
+		@Override
+		protected String[] doInBackground(MainActivity... params)
+		{
+			String[] batchIds;
+			String[] sResult;
+			MainActivity activity = params[0];
+			
+			try {
+				HashMap<ProfilesQueryBatchProperty, Object> queryMap = new HashMap<ProfilesQueryBatchProperty, Object>();
+				queryMap.put(activity.batchCriteriaType, activity.batchCriteriaValue);
+				if (activity.queryMaxCount > 0) {
+					queryMap.put(ProfilesQueryBatchProperty.count, activity.queryMaxCount);
+				}
+				ProfilesRestClient client= new ProfilesRestClient(
+						activity.server,
+						activity.user,
+						activity.password
+					);
+				
+				batchIds = client.getBatchesByProperties(queryMap);
+				if (batchIds.length > 0)
+				{
+					sResult = new String[batchIds.length + 1];
+					sResult[0] = String.format("%d", batchIds.length);
+					for (int i = 0; i < batchIds.length; i++)
+					{
+						sResult[i + 1] = batchIds[i];
+					}
+				}
+				else
+				{
+					sResult = new String[2];
+					sResult[0] = "0";
+					sResult[1] = "No matching batches found";
+				}
+			}
+			catch (Exception e) {
+				sResult = new String[2];
+				sResult[0] = "-1";
+				sResult[1] = "Error: " + e.getMessage();
+			}			
+			return sResult;			
+		}
+		
+		@Override
+		protected void onPostExecute(String[] response)
+		{
+			progressDlg.dismiss();
+			int numBatches = Integer.parseInt(response[0]);
+			switch (numBatches)
+			{
+				case -1:
+				case 0:
+					displayTestConnectionResults(response);
+					break;
+				default:
+					foundBatchUrns = new String[numBatches];
+					for (int i = 0; i < numBatches; i++) {
+						foundBatchUrns[i] = response[i+1];
+					}
+					iState = FWSTATE_FOUNDBATCHES;
+					updateState();					
+			}
+
+		}
+	}		
+	
 	private class QueryTagsTask extends AsyncTask<MainActivity, Integer, String[]>
 	{
 		@Override
@@ -812,7 +992,7 @@ public class MainActivity extends Activity {
 			
 			try {
 				HashMap<ProfilesQueryTagProperty, Object> queryMap = new HashMap<ProfilesQueryTagProperty, Object>();
-				queryMap.put(activity.criteriaType, activity.criteriaValue);
+				queryMap.put(activity.tagCriteriaType, activity.tagCriteriaValue);
 				if (activity.queryMaxCount > 0) {
 					queryMap.put(ProfilesQueryTagProperty.count, activity.queryMaxCount);
 				}

@@ -10,15 +10,15 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Spinner;
 
-public class QueryTagsFragment extends Fragment {
+public class QueryBatchesFragment extends Fragment {
 
-    public QueryTagsFragment() {
+    public QueryBatchesFragment() {
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-    	_view = inflater.inflate(R.layout.fragment_querytags, container, false);
+    	_view = inflater.inflate(R.layout.fragment_querybatches, container, false);
         ((EditText) _view.findViewById(R.id.editTextCriteria)).setText(_sCriteria);        
         return _view;
     }

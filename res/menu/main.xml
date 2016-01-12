@@ -9,13 +9,19 @@
         android:id="@+id/search"
         android:orderInCategory="100"
         android:showAsAction="always"
-        android:title="@string/search"/>   
-        
+        android:title="@string/search"/>
+    
     <item
-        android:id="@+id/search"
+        android:id="@+id/searchBatches"
         android:orderInCategory="101"
         android:showAsAction="always"
-        android:title="@string/searchTags"/>     
+        android:title="@string/searchBatches"/>    
+        
+    <item
+        android:id="@+id/searchTags"
+        android:orderInCategory="102"
+        android:showAsAction="always"
+        android:title="@string/searchTags"/>   
 
     <item
         android:id="@+id/config"
