@@ -56,6 +56,8 @@ public class MainActivity extends Activity implements OnItemClickListener {
     public static final int IMAGE_ERROR = 3;
     public static final int IMAGE_CERTIFIED = 4;
     public static final int IMAGE_INVALID = 5;
+    public static final int IMAGE_BATCH = 6;
+    public static final int IMAGE_TAG = 7;
     
 	// state machine
 	final int FWSTATE_SCANTAG = 1;
@@ -122,13 +124,15 @@ public class MainActivity extends Activity implements OnItemClickListener {
         progressDlg.setMessage("Please wait");
         
         // load images
-        aImagesState = new Drawable[6];
+        aImagesState = new Drawable[8];
         aImagesState[IMAGE_NONE] = null;
         aImagesState[IMAGE_OK] = MainActivity.this.getResources().getDrawable(R.drawable.ok);
         aImagesState[IMAGE_WARNING] = MainActivity.this.getResources().getDrawable(R.drawable.warning);
         aImagesState[IMAGE_ERROR] = MainActivity.this.getResources().getDrawable(R.drawable.error);
         aImagesState[IMAGE_CERTIFIED] = MainActivity.this.getResources().getDrawable(R.drawable.logo_authentic);
         aImagesState[IMAGE_INVALID] = MainActivity.this.getResources().getDrawable(R.drawable.logo_authfailed);
+        aImagesState[IMAGE_BATCH] = MainActivity.this.getResources().getDrawable(R.drawable.batch);
+        aImagesState[IMAGE_TAG] = MainActivity.this.getResources().getDrawable(R.drawable.tag);
         
         // prepare search criterias
         batchCriteriaMap = new HashMap<String, ProfilesQueryBatchProperty>();
@@ -410,7 +414,7 @@ public class MainActivity extends Activity implements OnItemClickListener {
 				FoundBatchesFragment fbf = new FoundBatchesFragment();
 				icons = new Drawable[foundBatchUrns.length];
 				for (int i = 0; i < foundBatchUrns.length; i++) {
-					icons[i] = aImagesState[IMAGE_OK];
+					icons[i] = aImagesState[IMAGE_BATCH];
 				}
 				fbf.setStatusImages(icons);
 				fbf.setUids(foundBatchUrns);
@@ -429,7 +433,7 @@ public class MainActivity extends Activity implements OnItemClickListener {
 				FoundTagsFragment ftf = new FoundTagsFragment();
 				icons = new Drawable[foundTagIds.length];
 				for (int i = 0; i < foundTagIds.length; i++) {
-					icons[i] = aImagesState[IMAGE_OK];
+					icons[i] = aImagesState[IMAGE_TAG];
 				}
 				ftf.setStatusImages(icons);
 				ftf.setUids(foundTagIds);
@@ -619,7 +623,7 @@ public class MainActivity extends Activity implements OnItemClickListener {
 			
 			String[] sResult = new String[5];
 			
-			sResult[MSG_NTAGVERSION] = "Tag is no NXP NTAG";
+			sResult[MSG_NTAGVERSION] = "Tag is not a valid NXP NTAG";
 			sResult[MSG_NXPSIGNATURE] = "";
 			sResult[MSG_PROFILESAUTH] = "";
 			sResult[MSG_PRODUCTAUTH] = "";
