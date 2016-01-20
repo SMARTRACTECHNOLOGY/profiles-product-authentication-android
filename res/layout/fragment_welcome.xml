@@ -37,6 +37,7 @@
         android:layout_below="@+id/imageViewProfilesBanner"
         android:linksClickable="true"
         android:text="@string/txtWelcome1"
+        android:textColorLink="#FF6600"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
 </RelativeLayout>

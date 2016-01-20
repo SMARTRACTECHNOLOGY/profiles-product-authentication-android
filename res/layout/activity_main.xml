@@ -3,6 +3,7 @@
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/profiles_background"
     tools:context="com.smartrac.profiles.productauth.MainActivity"
     tools:ignore="MergeRootFrame" />
 
