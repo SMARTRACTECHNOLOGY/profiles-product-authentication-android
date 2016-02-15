@@ -4,6 +4,9 @@
     <string name="app_name">Profiles</string>
         
     <!-- Action menu -->
+    <string name="create">New</string>
+    <string name="createTags">Sign Tags</string>
+    
     <string name="search">Search</string>
     
     <string name="searchBatches">Query Batches&#8230;</string>
@@ -27,7 +30,7 @@
     
     <string name="app_about">
         SMART COSMOS Profiles App\n
-        Version 1.9\n
+        Version 1.10\n
         &#169; 2016 SMARTRAC TECHNOLOGY Fletcher, Inc. 
     </string>
     <string name="app_onClose">
@@ -88,7 +91,11 @@
 
     <!-- Found Tags -->
     <string name="txtFoundTags">Tags Found:</string>
-    <string name="foundTags_btnOK">OK</string>    
+    <string name="foundTags_btnOK">OK</string>
+    
+    <!-- Encode Tag -->
+    <string name="encode_tag">Tap a new tag to encode it with authentication data&#8230;
+        \n\nAll tags encoded by the app will be added to the Batch \'MyProfilesBatch\'.</string>    
     
     <!-- Settings -->
     <string name="settingsNetworkTitle">Network settings</string>

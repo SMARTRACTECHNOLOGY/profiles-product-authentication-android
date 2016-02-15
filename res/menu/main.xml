@@ -6,62 +6,74 @@
     <!--  xmlns:app="http://schemas.android.com/apk/res-auto"  -->
     
     <item
-        android:id="@+id/search"
+        android:id="@+id/create"
         android:orderInCategory="100"
+        android:showAsAction="always"
+        android:title="@string/create"/>    
+    
+    <item
+        android:id="@+id/createTags"
+        android:orderInCategory="101"
+        android:showAsAction="always"
+        android:title="@string/createTags"/>      
+    
+    <item
+        android:id="@+id/search"
+        android:orderInCategory="200"
         android:showAsAction="always"
         android:title="@string/search"/>
     
     <item
         android:id="@+id/searchBatches"
-        android:orderInCategory="101"
+        android:orderInCategory="201"
         android:showAsAction="always"
         android:title="@string/searchBatches"/>    
         
     <item
         android:id="@+id/searchTags"
-        android:orderInCategory="102"
+        android:orderInCategory="202"
         android:showAsAction="always"
         android:title="@string/searchTags"/>   
 
     <item
         android:id="@+id/config"
-        android:orderInCategory="200"
+        android:orderInCategory="300"
         android:showAsAction="always"
         android:title="@string/config"/>       
     
     <item
         android:id="@+id/action_settings"
-        android:orderInCategory="201"
+        android:orderInCategory="301"
         android:showAsAction="always"
         android:title="@string/action_settings"/>
     
     <item
         android:id="@+id/action_apidoc"
-        android:orderInCategory="202"
+        android:orderInCategory="302"
         android:showAsAction="always"
         android:title="@string/action_apidoc"/>      
 
     <item
         android:id="@+id/action_feedback"
-        android:orderInCategory="203"
+        android:orderInCategory="303"
         android:showAsAction="always"
         android:title="@string/action_feedback"/>
     
     <item
         android:id="@+id/action_partner"
-        android:orderInCategory="204"
+        android:orderInCategory="304"
         android:showAsAction="always"
         android:title="@string/action_partner"/>      
     
     <item
         android:id="@+id/action_account"
-        android:orderInCategory="205"
+        android:orderInCategory="305"
         android:showAsAction="always"
         android:title="@string/action_account"/>  
 
     <item
         android:id="@+id/action_about"
-        android:orderInCategory="206"
+        android:orderInCategory="306"
         android:showAsAction="always"
         android:title="@string/action_about"/>        
 

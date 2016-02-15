@@ -37,8 +37,10 @@ import com.smartrac.nfc.NfcNtag;
 import com.smartrac.nfc.NfcNtagVersion;
 import net.smartcosmos.android.utility.AsciiHexConverter;
 import net.smartcosmos.android.utility.IntentLauncher;
+import net.smartcosmos.android.utility.Secure;
 import net.smartcosmos.android.ProfilesRestClient;
 import net.smartcosmos.android.ProfilesRestClient.ProfilesRestResult;
+import net.smartcosmos.android.ProfilesTransactionRequest;
 import net.smartcosmos.android.ProfilesRestClient.ProfilesAuthOtpState;
 import net.smartcosmos.android.ProfilesQueryBatchProperty;
 import net.smartcosmos.android.ProfilesQueryTagProperty;
@@ -66,6 +68,7 @@ public class MainActivity extends Activity implements OnItemClickListener {
 	final int FWSTATE_FOUNDBATCHES = 4;	
 	final int FWSTATE_QUERYTAGS = 5;
 	final int FWSTATE_FOUNDTAGS = 6;
+	final int FWSTATE_ENCODETAG = 7;
 	final int FWSTATE_WELCOME = 250;
 	final int FWSTATE_SETTINGS = 255;
 	
@@ -242,8 +245,12 @@ public class MainActivity extends Activity implements OnItemClickListener {
 				ntag = NfcNtag.get(tag);
 				if (ntag != null)
 				{
-					progressDlg.setTitle("Verifying tag...");
-					new VerifyNtagTask().execute(this);
+					if (iState == FWSTATE_ENCODETAG) {
+						new EncodeTagTask().execute(this);
+					}
+					else {
+						new VerifyNtagTask().execute(this);
+					}
 				}
 			}
 			else
@@ -359,7 +366,10 @@ public class MainActivity extends Activity implements OnItemClickListener {
 					iState = FWSTATE_QUERYTAGS;
 					updateState();					
 				}
-			break;		
+			break;
+			case FWSTATE_ENCODETAG:
+				// this should never happen (no OK button in ScanTag)
+			break;
 			case FWSTATE_SETTINGS:
 				SettingsFragment sf = (SettingsFragment)getFragmentManager().findFragmentById(R.id.container);
 				server = sf.getServer();
@@ -440,7 +450,12 @@ public class MainActivity extends Activity implements OnItemClickListener {
 		    	getFragmentManager().beginTransaction()
 				.replace(R.id.container, ftf)
 				.commit();					
-			break;		
+			break;
+			case FWSTATE_ENCODETAG:
+		    	getFragmentManager().beginTransaction()
+				.replace(R.id.container, new EncodeTagFragment())
+				.commit();	
+			break;			
 			case FWSTATE_SETTINGS:
 				SettingsFragment sf = new SettingsFragment();
 				sf.setServer(server);
@@ -463,6 +478,7 @@ public class MainActivity extends Activity implements OnItemClickListener {
 			case FWSTATE_SETTINGS:
 			case FWSTATE_QUERYBATCHES:
 			case FWSTATE_QUERYTAGS:
+			case FWSTATE_ENCODETAG:
 				iState = FWSTATE_SCANTAG;
 				updateState();
 				break;
@@ -536,6 +552,9 @@ public class MainActivity extends Activity implements OnItemClickListener {
 	public boolean onOptionsItemSelected(MenuItem item) {
 	    // Handle presses on the action bar items
 	    switch (item.getItemId()) {
+	      case R.id.createTags:
+	    	  new TestAdminRoleTask().execute(this);
+	    	  return true;
 	      case R.id.searchBatches:
 	    	  iState = FWSTATE_QUERYBATCHES;
 	    	  updateState();
@@ -596,6 +615,7 @@ public class MainActivity extends Activity implements OnItemClickListener {
 		protected void onPreExecute()
 		{
 			super.onPreExecute();
+			progressDlg.setTitle("Verifying tag...");
 			progressDlg.show();
 		}
 
@@ -1099,4 +1119,213 @@ public class MainActivity extends Activity implements OnItemClickListener {
 			displayTestConnectionResults(response);
 		}
 	}
+	
+	private class TestAdminRoleTask extends AsyncTask<MainActivity, Integer, String[]>
+	{
+		@Override
+		protected void onPreExecute()
+		{
+			super.onPreExecute();
+			progressDlg.setTitle("Verifying admin access...");
+			progressDlg.show();
+		}
+
+		@Override
+		protected String[] doInBackground(MainActivity... params)
+		{
+			String sResult[] = new String[2];
+			
+			try {
+				sResult[0] = "No tag encoding possible";
+				sResult[1] = "";
+				String[] account = user.split("@");
+				if (account.length != 2)
+				{
+					throw new Exception("Settings: User is no valid e-mail address");
+				}
+				ProfilesRestClient client= new ProfilesRestClient(server, user, password);
+				ProfilesTransactionRequest req = new ProfilesTransactionRequest(account[1]);
+				ProfilesRestResult result = client.importProfilesData(req);
+				switch (result.httpStatus) {
+					case 200:
+						if (result.iCode == 1)
+							sResult[0] = "";
+						else
+							sResult[1] = result.sMessage;
+					break;
+					case 401:
+						sResult[0] = "Login incorrect";
+					break;
+					case 403:
+						sResult[0] = "User has no tag import permission";
+					break;
+					case 404:
+						sResult[0] = "Tag import endpoint unavailable";
+					break;
+					default:
+				}
+				StringBuilder sb = new StringBuilder();
+				sb.append("HTTP " + result.httpStatus);
+				sb.append("\nReturn code: " + result.iCode);
+				sb.append("\nMessage: " + result.sMessage);
+				sResult[1] = sb.toString();
+			}
+			catch (Exception e) {
+				sResult[1] = "Error: " + e.getMessage();
+			}			
+			return sResult;			
+		}
+		
+		@Override
+		protected void onPostExecute(String[] response)
+		{
+			progressDlg.dismiss();
+			if (response[0].isEmpty()) {
+		    	  iState = FWSTATE_ENCODETAG;
+		    	  updateState();
+			}
+			else {
+				displayTestConnectionResults(response);
+			}
+		}
+	}
+	
+	private class EncodeTagTask extends AsyncTask<MainActivity, Integer, String[]>
+	{
+		@Override
+		protected void onPreExecute()
+		{
+			super.onPreExecute();
+			progressDlg.setTitle("Encoding tag - do not move device...");
+			progressDlg.show();
+		}
+
+		@Override
+		protected String[] doInBackground(MainActivity... params)
+		{
+			byte[] version;
+			byte[] signature;
+			byte[] hmac;
+			byte[] pwd;
+			byte[] pack;
+			byte[] config;
+			byte[] data;
+			int configBlock = 0;
+			
+			String sVersion;
+			String sResult[] = new String[2];
+			
+			try {
+				sResult[0] = "Error during encode";
+				sResult[1] = "";
+				String[] account = user.split("@");
+				if (account.length != 2)
+				{
+					throw new Exception("Settings: User is no valid e-mail address");
+				}
+				
+				ntag.connect();
+				
+				// Get chip version and signature
+				version = ntag.getVersion();
+				if (version == null) {
+					throw new Exception("NFC: Cannot identify chip type.");
+				}
+					
+				sVersion = NfcNtagVersion.fromGetVersion(version).toString();
+				signature = ntag.readSig();
+				if (signature == null) {
+					throw new Exception("NFC: Cannot read NXP signature.");
+				}				
+				
+				// Test signature in Profiles
+				ProfilesRestClient client = new ProfilesRestClient(server, user, password); 
+				ProfilesRestResult result = client.verifyNxpTag(uid, version, signature);
+				if ((result.httpStatus != 200) || (result.iCode != 0)) {
+					throw new Exception(result.sMessage);
+				}
+				
+				// Test chip compatibility     
+				if (sVersion.equals("NTAG 213")) {
+					configBlock = 0x29;
+				}
+				if (sVersion.equals("NTAG 215")) {
+					configBlock = 0x83;
+				}
+				if (sVersion.equals("NTAG 216")) {
+					configBlock = 0xE3;
+				}				 
+				if (configBlock == 0) {
+					throw new Exception("Error: Unsupported chip type.");
+				}
+				 
+				// Read CONFIG block
+				config = ntag.read(configBlock);
+				if ((config == null) || (config.length != 16))
+				{
+					throw new Exception("NFC: Error reading CONFIG - tag is already encoded.");
+				}
+				
+				// Generate OTP data
+				hmac = Secure.getRandomBytes(72);
+				//pwd = Secure.getRandomBytes(4);
+				pwd = new byte[] {0,0,0,0};
+				pack = Secure.getRandomBytes(2);
+				 
+				// Write HMAC
+				for (int i=0; i<18; i++) {
+					data = new byte[4];
+					System.arraycopy(hmac, 4*i, data, 0, data.length);
+					if (!ntag.write(0x16 + i, data)) {
+						throw new Exception("NFC: Error writing HMAC");
+					}
+				}
+				 
+				// Update CONFIG with encoding data
+				config[3] = 0x16; 			// AUTH0:  first protected block
+				config[4] = (byte)0x80;	// ACCESS: protect both read & write access
+				System.arraycopy(pwd, 0, config, 8, pwd.length);
+				System.arraycopy(pack, 0, config, 12, pack.length);
+				
+				for (int i=0; i<4; i++) {
+					 data = new byte[4];
+					 System.arraycopy(config, 4*i, data, 0, data.length);
+					 if (!ntag.write(configBlock + i, data)) {
+						 throw new Exception("NFC: Error writing CONFIG");
+					 }
+				}
+				//*/
+				 
+				// Store NTAG data in Profiles
+				String batchId = "MyProfilesBatch";
+				ProfilesTransactionRequest transaction = new ProfilesTransactionRequest(account[1]);
+				transaction.addBatch(batchId);
+				transaction.addTag(batchId, uid);
+				Map<String, String>tagdata = new HashMap<String, String>();
+				tagdata.put("tag:hmac:auth", AsciiHexConverter.bytesToHex(hmac));
+				tagdata.put("tag:hmac:key", AsciiHexConverter.bytesToHex(pwd));
+				tagdata.put("tag:pack:value", AsciiHexConverter.bytesToHex(pack));
+				transaction.addTagData(uid, tagdata);
+				result = client.importProfilesData(transaction);
+				if ((result.httpStatus != 200) || (result.iCode != 1)) {
+					throw new Exception(result.sMessage);
+				}
+				
+				ntag.close();				
+				sResult[0] = "Encode tag complete.";
+				sResult[1] = "The tag can now be authenticated in Profiles.";
+			}
+			catch (Exception e) {
+				sResult[1] = e.getMessage();
+			}			
+			return sResult;			
+		}
+		
+		@Override
+		protected void onPostExecute(String[] response)
+		{
+			progressDlg.dismiss();
+			displayTestConnectionResults(response);
+		}
+	}	
 }
