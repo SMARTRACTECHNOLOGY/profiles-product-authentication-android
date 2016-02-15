@@ -1268,8 +1268,7 @@ public class MainActivity extends Activity implements OnItemClickListener {
 				
 				// Generate OTP data
 				hmac = Secure.getRandomBytes(72);
-				//pwd = Secure.getRandomBytes(4);
-				pwd = new byte[] {0,0,0,0};
+				pwd = Secure.getRandomBytes(4);
 				pack = Secure.getRandomBytes(2);
 				 
 				// Write HMAC
