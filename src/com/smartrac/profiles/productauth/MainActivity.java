@@ -1163,6 +1163,7 @@ public class MainActivity extends Activity implements OnItemClickListener {
 						sResult[0] = "Tag import endpoint unavailable";
 					break;
 					default:
+						sResult[0] = "Unknown error";
 				}
 				StringBuilder sb = new StringBuilder();
 				sb.append("HTTP " + result.httpStatus);
