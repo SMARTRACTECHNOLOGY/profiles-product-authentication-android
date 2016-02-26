@@ -1138,13 +1138,10 @@ public class MainActivity extends Activity implements OnItemClickListener {
 			try {
 				sResult[0] = "No tag encoding possible";
 				sResult[1] = "";
-				String[] account = user.split("@");
-				if (account.length != 2)
-				{
-					throw new Exception("Settings: User is no valid e-mail address");
-				}
+
 				ProfilesRestClient client= new ProfilesRestClient(server, user, password);
-				ProfilesTransactionRequest req = new ProfilesTransactionRequest(account[1]);
+				String account = client.getAccount();
+				ProfilesTransactionRequest req = new ProfilesTransactionRequest(account);
 				ProfilesRestResult result = client.importProfilesData(req);
 				switch (result.httpStatus) {
 					case 200:
@@ -1219,11 +1216,9 @@ public class MainActivity extends Activity implements OnItemClickListener {
 			try {
 				sResult[0] = "Error during encode";
 				sResult[1] = "";
-				String[] account = user.split("@");
-				if (account.length != 2)
-				{
-					throw new Exception("Settings: User is no valid e-mail address");
-				}
+				
+				ProfilesRestClient client = new ProfilesRestClient(server, user, password);
+				String account = client.getAccount();
 				
 				ntag.connect();
 				
@@ -1240,7 +1235,6 @@ public class MainActivity extends Activity implements OnItemClickListener {
 				}				
 				
 				// Test signature in Profiles
-				ProfilesRestClient client = new ProfilesRestClient(server, user, password); 
 				ProfilesRestResult result = client.verifyNxpTag(uid, version, signature);
 				if ((result.httpStatus != 200) || (result.iCode != 0)) {
 					throw new Exception(result.sMessage);
@@ -1298,7 +1292,7 @@ public class MainActivity extends Activity implements OnItemClickListener {
 				 
 				// Store NTAG data in Profiles
 				String batchId = "MyProfilesBatch";
-				ProfilesTransactionRequest transaction = new ProfilesTransactionRequest(account[1]);
+				ProfilesTransactionRequest transaction = new ProfilesTransactionRequest(account);
 				transaction.addBatch(batchId);
 				transaction.addTag(batchId, uid);
 				Map<String, String>tagdata = new HashMap<String, String>();
