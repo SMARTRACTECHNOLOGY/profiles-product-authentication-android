@@ -1086,24 +1086,26 @@ public class MainActivity extends Activity implements OnItemClickListener {
 		@Override
 		protected String[] doInBackground(MainActivity... params)
 		{
+			byte[] dummyUid = {0,0,0,0};
+			String dummyAppId = "TEST_CONNECTION";
 			String sResult[] = new String[2];
 			
 			try {
 				SettingsFragment sf = (SettingsFragment)getFragmentManager().findFragmentById(R.id.container);
 				ProfilesRestClient client= new ProfilesRestClient(sf.getServer(), sf.getUser(), sf.getPassword());
-				ProfilesRestResult result = client.getVerificationMessage("RR",  0);
-				if ((result.httpStatus == 200) && (result.iCode == 0))
-				{
+				ProfilesRestResult result = client.getSingleTagValue(dummyUid, dummyAppId);
+				if ((result.httpStatus == 200) && ((result.iCode == 0) || (result.iCode == 1))) {
 					sResult[0] = "Test Connection OK";
 				}
-				else
-				{
+				else {
 					sResult[0] = "Test Connection FAILED";
 				}
 				StringBuilder sb = new StringBuilder();
 				sb.append("HTTP " + result.httpStatus);
 				sb.append("\nReturn code: " + result.iCode);
-				sb.append("\nMessage: " + result.sMessage);
+                if (result.sMessage != null) {
+                    sb.append("\nMessage: " + result.sMessage);
+                }
 				sResult[1] = sb.toString();
 			}
 			catch (Exception e) {
