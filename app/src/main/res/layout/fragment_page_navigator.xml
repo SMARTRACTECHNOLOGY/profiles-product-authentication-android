@@ -1,0 +1,47 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageButton
+        android:src="@drawable/ic_first_page"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btnFirstPage" />
+
+    <ImageButton
+        android:src="@drawable/ic_chevron_left"
+        android:layout_toRightOf="@id/btnFirstPage"
+        android:layout_centerVertical="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btnPreviousPage" />
+
+    <ImageButton
+        android:src="@drawable/ic_last_page"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btnLastPage" />
+
+    <ImageButton
+        android:src="@drawable/ic_chevron_right"
+        android:layout_toLeftOf="@id/btnLastPage"
+        android:layout_centerVertical="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btnNextPage" />
+
+    <TextView
+        android:id="@+id/textViewPageInformation"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/txtPageInformation"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+</RelativeLayout>

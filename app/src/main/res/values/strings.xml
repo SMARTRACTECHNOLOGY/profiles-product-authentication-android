@@ -92,6 +92,9 @@
     <!-- Found Tags -->
     <string name="txtFoundTags">Tags Found:</string>
     <string name="foundTags_btnOK">OK</string>
+
+    <!-- Paging Navigation -->
+    <string name="txtPageInformation">Page 0 of 0"</string>
     
     <!-- Encode Tag -->
     <string name="encode_tag">Tap a new tag to encode it with authentication data&#8230;
