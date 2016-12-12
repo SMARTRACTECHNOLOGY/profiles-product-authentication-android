@@ -1144,9 +1144,12 @@ public class MainActivity extends Activity implements OnItemClickListener {
 				sResult[1] = "";
 
 				ProfilesRestClient client= new ProfilesRestClient(server, user, password);
-				String account = client.getAccount();
+                ProfilesBulkImportRequest req = new ProfilesBulkImportRequest();
+                ProfilesRestResult result = client.importProfilesData(req);
+
+				/*String account = client.getAccount();
 				ProfilesTransactionRequest req = new ProfilesTransactionRequest(account);
-				ProfilesRestResult result = client.importProfilesData(req);
+				ProfilesRestResult result = client.importProfilesData(req); */
 				switch (result.httpStatus) {
 					case 200:
 						if (result.iCode == 1)
@@ -1309,20 +1312,19 @@ public class MainActivity extends Activity implements OnItemClickListener {
 				if ((result.httpStatus != 200) || (result.iCode != 1)) {
 					throw new Exception(result.sMessage);
 				} */
-				try {
-					ProfilesBulkImportRequest importRequest = new ProfilesBulkImportRequest();
-					importRequest.addBatch(batchId);
-					importRequest.addTag(batchId, uid);
-					Map<String, Object>tagdata = new HashMap<String, Object>();
-					tagdata.put("tag:hmac:auth", AsciiHexConverter.bytesToHex(hmac));
-					tagdata.put("tag:hmac:key", AsciiHexConverter.bytesToHex(pwd));
-					tagdata.put("tag:pack:value", AsciiHexConverter.bytesToHex(pack));
-					importRequest.addTagData(uid, tagdata);
-				} catch (Exception eImport) {
-					Log.d(TAG, "Import failed: " + eImport.getMessage());
-                    throw new Exception("Error: Import failed");
-				}
-				
+                ProfilesBulkImportRequest importRequest = new ProfilesBulkImportRequest();
+                importRequest.addBatch(batchId);
+                importRequest.addTag(batchId, uid);
+                Map<String, Object>tagdata = new HashMap<String, Object>();
+                tagdata.put("tag:hmac:auth", AsciiHexConverter.bytesToHex(hmac));
+                tagdata.put("tag:hmac:key", AsciiHexConverter.bytesToHex(pwd));
+                tagdata.put("tag:pack:value", AsciiHexConverter.bytesToHex(pack));
+                importRequest.addTagData(uid, tagdata);
+                    result = client.importProfilesData(importRequest);
+                if ((result.httpStatus != 200) || (result.iCode != 1)) {
+                    throw new Exception(result.sMessage);
+                }
+
 				ntag.close();				
 				sResult[0] = "Encode tag complete.";
 				sResult[1] = "The tag can now be authenticated in Profiles.";
