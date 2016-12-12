@@ -35,6 +35,8 @@ import android.nfc.tech.NfcV;
 
 import com.smartrac.nfc.NfcNtag;
 import com.smartrac.nfc.NfcNtagVersion;
+
+import net.smartcosmos.android.ProfilesBulkImportRequest;
 import net.smartcosmos.android.utility.AsciiHexConverter;
 import net.smartcosmos.android.utility.IntentLauncher;
 import net.smartcosmos.android.utility.Secure;
@@ -1220,7 +1222,7 @@ public class MainActivity extends Activity implements OnItemClickListener {
 				sResult[1] = "";
 				
 				ProfilesRestClient client = new ProfilesRestClient(server, user, password);
-				String account = client.getAccount();
+				//String account = client.getAccount();
 				
 				ntag.connect();
 				
@@ -1294,6 +1296,7 @@ public class MainActivity extends Activity implements OnItemClickListener {
 				 
 				// Store NTAG data in Profiles
 				String batchId = "MyProfilesBatch";
+				/*
 				ProfilesTransactionRequest transaction = new ProfilesTransactionRequest(account);
 				transaction.addBatch(batchId);
 				transaction.addTag(batchId, uid);
@@ -1305,6 +1308,19 @@ public class MainActivity extends Activity implements OnItemClickListener {
 				result = client.importProfilesData(transaction);
 				if ((result.httpStatus != 200) || (result.iCode != 1)) {
 					throw new Exception(result.sMessage);
+				} */
+				try {
+					ProfilesBulkImportRequest importRequest = new ProfilesBulkImportRequest();
+					importRequest.addBatch(batchId);
+					importRequest.addTag(batchId, uid);
+					Map<String, Object>tagdata = new HashMap<String, Object>();
+					tagdata.put("tag:hmac:auth", AsciiHexConverter.bytesToHex(hmac));
+					tagdata.put("tag:hmac:key", AsciiHexConverter.bytesToHex(pwd));
+					tagdata.put("tag:pack:value", AsciiHexConverter.bytesToHex(pack));
+					importRequest.addTagData(uid, tagdata);
+				} catch (Exception eImport) {
+					Log.d(TAG, "Import failed: " + eImport.getMessage());
+                    throw new Exception("Error: Import failed");
 				}
 				
 				ntag.close();				
