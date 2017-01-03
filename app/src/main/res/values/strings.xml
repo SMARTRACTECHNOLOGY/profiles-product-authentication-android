@@ -20,8 +20,8 @@
     <string name="cfgApidoc">API Documentation&#8230;</string>    
     <string name="action_feedback">Feedback</string>
     <string name="cfgFeedback">Feedback&#8230;</string>
-    <string name="action_partner">Partner Portal</string>
-    <string name="cfgPartner">Partner Portal&#8230;</string>
+    <string name="action_partner">SMART COSMOS Portal</string>
+    <string name="cfgPartner">SMART COSMOS Portal&#8230;</string>
     <string name="action_account">Request Profiles account</string>
     <string name="cfgAccount">Request Profiles account&#8230;</string>            
     <string name="action_about">About</string> 
@@ -31,7 +31,7 @@
     <string name="app_about">
         SMART COSMOS Profiles App\n
         Version 1.13\n
-        &#169; 2016 SMARTRAC TECHNOLOGY Fletcher, Inc. 
+        &#169; 2017 SMARTRAC TECHNOLOGY Fletcher, Inc.
     </string>
     <string name="app_onClose">
         Do you want to close Profiles?
@@ -53,7 +53,7 @@
         Welcome to SMART COSMOS\n\nThis app is publicly available on
         <a href="https://github.com/SMARTRACTECHNOLOGY-PUBLIC/smartcosmos-sdk-java-android-samples">GitHub</a>
         and demonstrates the integration between RFID and SMART COSMOS Profiles.
-	    Visit our <a href="https://partner.smart-cosmos.com">Partner Portal</a> and read through our
+	    Visit us on <a href="https://www.smart-cosmos.com">www.smart-cosmos.com</a> and read through our
 	    <a href="https://api.smartcosmos.net">API documentation</a>.
 	</string>
 	<string name="welcome_btnOK">Continue</string>
@@ -117,7 +117,7 @@
     <string name="urlApidoc">https://api.smartcosmos.net</string>
     <string name="urlGithub">https://github.com/SMARTRACTECHNOLOGY-PUBLIC/smartcosmos-sdk-java-android-samples</string>
     <string name="urlFeedback">https://smartractechnology.atlassian.net/rest/collectors/1.0/template/form/0a8f8726?os_authType=none</string>
-    <string name="urlPartner">https://partner.smart-cosmos.com</string>
+    <string name="urlPartner">https://www.smart-cosmos.com</string>
     
     <!-- Request Account -->
     <string name="accEmailAddr">api@smartrac-group.com</string>
