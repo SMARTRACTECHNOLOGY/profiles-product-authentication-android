@@ -1267,11 +1267,16 @@ public class MainActivity extends Activity implements OnItemClickListener {
 				{
 					throw new Exception("NFC: Error reading CONFIG - tag is already encoded.");
 				}
+				//*/
 				
 				// Generate OTP data
 				hmac = Secure.getRandomBytes(72);
 				pwd = Secure.getRandomBytes(4);
 				pack = Secure.getRandomBytes(2);
+
+				Log.d(TAG, "Encode HMAC: " + AsciiHexConverter.bytesToHex(hmac));
+				Log.d(TAG, "Encode PWD: " + AsciiHexConverter.bytesToHex(pwd));
+				Log.d(TAG, "Encode PACK: " + AsciiHexConverter.bytesToHex(pack));
 				 
 				// Write HMAC
 				for (int i=0; i<18; i++) {
