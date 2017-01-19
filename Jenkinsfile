@@ -1,4 +1,4 @@
 
 androidAppBuild {
-  appName = "profiles-product-authentiator"
+  appName = "profiles-product-authenticator"
 }
