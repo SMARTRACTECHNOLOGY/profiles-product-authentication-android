@@ -1,1 +1,1 @@
-= Profiles Authentication Android App
+= Profiles Product Authentication Android App
