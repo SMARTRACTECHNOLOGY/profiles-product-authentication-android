@@ -54,7 +54,7 @@
         <a href="https://github.com/SMARTRACTECHNOLOGY-PUBLIC/smartcosmos-sdk-java-android-samples">GitHub</a>
         and demonstrates the integration between RFID and SMART COSMOS Profiles.
 	    Visit us on <a href="https://www.smart-cosmos.com">www.smart-cosmos.com</a> and read through our
-	    <a href="https://api.smartcosmos.net">API documentation</a>.
+	    <a href="https://api.smartcosmos.net/profiles/index.html">API documentation</a>.
 	</string>
 	<string name="welcome_btnOK">Continue</string>
     
